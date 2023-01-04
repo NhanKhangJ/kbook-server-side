@@ -46,15 +46,17 @@ export const likePost = async(req,res) =>{
   if(!req.userId) return res.json({ message: 'Unauthenticated'});
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
   const post = await PostDetail.findById(id);
-  const user = await kbookUser.findById(id);
-
+  const user = await kbookUser.findById(req.userId);
+  // console.log(user);
   const index = post.likes.findIndex((id) => id === String(req.userId))
-  
-  
+  // const index = post.likes.findIndex((p) => p[userId] === String(req.userId))
+  // const userWhoLiked = {userId: user._id, name: user.name}
   if(index === -1){
     post.likes.push(req.userId)
+    //post.likes.push(userWhoLiked)
   } else{
     post.likes = post.likes.filter((id) => id !== String(req.userId))
+    //posts.likes.filter((userWholike) => userWholike[userId] !== String(req.userId))
   }
 
   const updatedPost = await PostDetail.findByIdAndUpdate(id, post,{new: true})

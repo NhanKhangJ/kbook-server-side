@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
 import  jwt  from 'jsonwebtoken';
 import kbookUser from '../models/user.js'
-const secret = process.env.SECRET
+import dotenv from 'dotenv';
+dotenv.config()
 
 export const signin = async(req,res) =>{
     const {email, password} = req.body;
@@ -14,7 +15,7 @@ export const signin = async(req,res) =>{
 
         if(!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials"})
 
-        const token = jwt.sign({ email: existingUser.email, id: existingUser._id}, 'test', {expiresIn: "1h"}) //send this token to the localstorage and It up to you to set the expire time 
+        const token = jwt.sign({ email: existingUser.email, id: existingUser._id}, process.env.SECRET, {expiresIn: "1h"}) //send this token to the localstorage and It up to you to set the expire time 
  
         res.status(200).json({result: existingUser, token})
     } catch (error) {
@@ -36,7 +37,7 @@ export const signup = async(req,res) =>{
 
         const result = await kbookUser.create({email, password: hashPassword, name:`${firstName} ${lastName}`});
 
-        const token = jwt.sign({ email: result.email, id: result._id}, 'test', {expiresIn: "1h"});
+        const token = jwt.sign({ email: result.email, id: result._id}, process.env.SECRET, {expiresIn: "1h"});
 
         res.status(200).json({result,token})
     } catch (error) {
