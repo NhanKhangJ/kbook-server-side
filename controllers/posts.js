@@ -48,18 +48,18 @@ export const likePost = async(req,res) =>{
   const post = await PostDetail.findById(id);
   const user = await kbookUser.findById(req.userId);
   // console.log(user);
-  const index = post.likes.findIndex((id) => id === String(req.userId))
-  // const index = post.likes.findIndex((p) => p[userId] === String(req.userId))
-  // const userWhoLiked = {userId: user._id, name: user.name}
+  // const index = post.likes.findIndex((id) => id === String(req.userId))
+  const index = post.likes.findIndex((p) => p.userId === String(req.userId))
+  const userWhoLiked = {userId: user._id, name: user.name}
   if(index === -1){
-    post.likes.push(req.userId)
-    //post.likes.push(userWhoLiked)
-  } else{
-    post.likes = post.likes.filter((id) => id !== String(req.userId))
-    //posts.likes.filter((userWholike) => userWholike[userId] !== String(req.userId))
+    // post.likes.push(req.userId)
+    post.likes.push(userWhoLiked)
+  } else if(index === post.likes.findIndex((p) => p.userId === String(req.userId))){
+    // post.likes = post.likes.filter((id) => id !== String(req.userId))
+  //  post.likes.filter((userWholike) => userWholike.userId !== String(req.userId));
+   post.likes.pull(userWhoLiked)
   }
 
   const updatedPost = await PostDetail.findByIdAndUpdate(id, post,{new: true})
-
   res.json(updatedPost)
 }
