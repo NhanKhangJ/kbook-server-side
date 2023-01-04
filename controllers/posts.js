@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import PostDetail from "../models/postsDetails.js";
+import kbookUser from  "../models/user.js"
 
 export const getPosts = async(req, res) =>{
     try {
@@ -11,8 +12,8 @@ export const getPosts = async(req, res) =>{
 }
 
 export const createPost = async(req,res) =>{
-    const {content,tags,selectedFile} = req.body;
-    const newPost = new PostDetail({content, tags, selectedFile})   
+    const post = req.body;
+    const newPost = new PostDetail({...post, creator: req.userId, createdAt: new Date().toISOString()})   
     try {
       await newPost.save();
       res.status(201).json(newPost)
@@ -20,12 +21,12 @@ export const createPost = async(req,res) =>{
       res.status(409).json({message: error.message});     
     }
 }
-
+   
 export const updatePost = async(req,res) =>{
   const {id} = req.params;
-  const {content ,tags, selectedFile } = req.body;
+  const { creator, content, tags, selectedFile } = req.body;
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`); // check this id is really an mongoose Id
-  const updatedPost = {content, tags, selectedFile, _id: id};
+  const updatedPost = {creator, content, tags, selectedFile, _id: id};
 
   await PostDetail.findByIdAndUpdate(id, updatedPost, {new: true});
   res.json(updatedPost)
@@ -38,4 +39,25 @@ export const deletePost = async(req,res) =>{
   await PostDetail.findByIdAndRemove(id);
 
   res.json({ message: 'Post deleted susccessfully'})
+}
+
+export const likePost = async(req,res) =>{
+  const {id} = req.params;
+  if(!req.userId) return res.json({ message: 'Unauthenticated'});
+  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
+  const post = await PostDetail.findById(id);
+  const user = await kbookUser.findById(id);
+
+  const index = post.likes.findIndex((id) => id === String(req.userId))
+  
+  
+  if(index === -1){
+    post.likes.push(req.userId)
+  } else{
+    post.likes = post.likes.filter((id) => id !== String(req.userId))
+  }
+
+  const updatedPost = await PostDetail.findByIdAndUpdate(id, post,{new: true})
+
+  res.json(updatedPost)
 }
