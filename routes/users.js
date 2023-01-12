@@ -1,8 +1,9 @@
 import express from 'express';
-import {signin, signup, getUser, updateUser } from '../controllers/user.js'
+import {signin, signup, getUser, updateUser, getUsers } from '../controllers/user.js'
 import auth from '../middleware/auth.js';
 const router = express.Router();
 
+router.get('/',getUsers);
 router.get('/:id',auth, getUser);
 router.patch('/:id',auth, updateUser)
 router.post('/signin',signin);

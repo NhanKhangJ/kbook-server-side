@@ -46,6 +46,7 @@ export const signup = async(req,res) =>{
     }
 }
 
+
 export const getUser = async(req, res) =>{
     const { id } = req.params;
     try {
@@ -53,6 +54,15 @@ export const getUser = async(req, res) =>{
         res.status(200).json(user)
     } catch (error) {
         res.status(404).json({ message: error.message})
+    }
+}
+
+export const getUsers = async(req,res) =>{
+    try {
+        const users = await kbookUser.find()
+        res.json(users)
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 }
 
