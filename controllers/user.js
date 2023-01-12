@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import  jwt  from 'jsonwebtoken';
-import kbookUser from '../models/user.js'
+import kbookUser from '../models/user.js';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config()
 
@@ -53,4 +54,13 @@ export const getUser = async(req, res) =>{
     } catch (error) {
         res.status(404).json({ message: error.message})
     }
+}
+
+export const updateUser = async (req,res) =>{
+    const { id } = req.params;
+    const {avatar, cover, job, education, location} = req.body;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No user with id: ${id}`);
+    const updatedUser = {avatar, cover, job, location, education, _id: id}
+    await kbookUser.findByIdAndUpdate(id, updatedUser, {new: true})
+    res.json(updatedUser)
 }
