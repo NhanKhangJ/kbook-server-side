@@ -3,6 +3,7 @@ import mongoose  from "mongoose";
 const postSchema = mongoose.Schema({
     creator: String,
     name: String,
+    creatorAvatar: String,
     content: String,
     tags: [String],
     selectedFile: String,
@@ -21,6 +22,7 @@ const postSchema = mongoose.Schema({
         type: [mongoose.Schema({
             id: Number,
             creator: String,
+            creatorAvatar: String,
             comment: String,
         })]   
     },

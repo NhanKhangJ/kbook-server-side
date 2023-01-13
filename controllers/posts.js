@@ -13,7 +13,8 @@ export const getPosts = async(req, res) =>{
 
 export const createPost = async(req,res) =>{
     const post = req.body;
-    const newPost = new PostDetail({...post, creator: req.userId, createdAt: new Date().toISOString()})   
+    const user = await kbookUser.findById(req.userId)
+    const newPost = new PostDetail({...post, creator: req.userId, creatorAvatar: user.avatar, createdAt: new Date().toISOString()})   
     try {
       await newPost.save();
       res.status(201).json(newPost)
@@ -68,7 +69,7 @@ export const commentPost = async(req,res) =>{
   const post = await PostDetail.findById(id);
   const user = await kbookUser.findById(req.userId);
    
-  const comment = { id: user._id, creator: user.name, comment: value}
+  const comment = { id: user._id, creator: user.name, creatorAvatar: user.avatar , comment: value}
 
   post.comments.push(comment)
 
