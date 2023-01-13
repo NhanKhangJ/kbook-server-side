@@ -20,11 +20,11 @@ const postSchema = mongoose.Schema({
     },
     comments:{
         type: [mongoose.Schema({
-            id: Number,
+            id: String,
             creator: String,
             creatorAvatar: String,
             comment: String,
-        })]   
+        }, {_id: false})]   
     },
     createdAt: {
         type: Date,
