@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import  jwt  from 'jsonwebtoken';
 import kbookUser from '../models/user.js';
+import PostDetail from "../models/postsDetails.js";
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config()
@@ -70,6 +71,9 @@ export const updateUser = async (req,res) =>{
     const { id } = req.params;
     const {avatar, cover, job, education, location} = req.body;
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No user with id: ${id}`);
+    // Find the post to update the Avatar
+    await PostDetail.updateMany({creator : req.userId}, { $set: { creatorAvatar: avatar } }); 
+    await PostDetail.updateMany({'comments.id' : req.userId}, {$set: {'comments.$.creatorAvatar' : avatar}})
     const updatedUser = {avatar, cover, job, location, education, _id: id}
     await kbookUser.findByIdAndUpdate(id, updatedUser, {new: true})
     res.json(updatedUser)
