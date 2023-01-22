@@ -72,9 +72,9 @@ export const updateUser = async (req,res) =>{
     const {avatar, cover, job, education, location} = req.body;
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No user with id: ${id}`);
     // Find the post to update the Avatar
-    await PostDetail.updateMany({creator : req.userId}, { $set: { creatorAvatar: avatar } }); 
-    await PostDetail.updateMany({'comments.id' : req.userId}, {$set: {'comments.$.creatorAvatar' : avatar}})
     const updatedUser = {avatar, cover, job, location, education, _id: id}
+    await PostDetail.updateMany({creator : req.userId}, { $set: { creatorAvatar: avatar } }); 
+    await PostDetail.updateMany({'comments.id' : req.userId.toString()}, {$set: {'comments.$.creatorAvatar' : avatar}})
     await kbookUser.findByIdAndUpdate(id, updatedUser, {new: true})
     res.json(updatedUser)
 }
