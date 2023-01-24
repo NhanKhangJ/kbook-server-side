@@ -31,7 +31,7 @@ export const signup = async(req,res) =>{
     try {
         const existingUser = await kbookUser.findOne({ email });
 
-        if (existingUser) return res.status(400).json({message: "User already exissr"});
+        if (existingUser) return res.status(400).json({message: "User already exist"});
 
         if(password !== confirmPassword) return res.status(400).json({message: "Passwords don't match"})
 
