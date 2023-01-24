@@ -16,9 +16,11 @@ export const signin = async(req,res) =>{
         const isPasswordCorrect = await bcrypt.compare(password,existingUser.password);
 
         if(!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials"})
-
-        const token = jwt.sign({ email: existingUser.email, id: existingUser._id}, process.env.SECRET, {expiresIn: "1h"}) //send this token to the localstorage and It up to you to set the expire time 
- 
+        
+        const decodeMessage = "Thank you decoding this and please don't try to steal my users information"
+         
+        const token = jwt.sign({ message: decodeMessage ,id: existingUser._id}, process.env.SECRET, {expiresIn: "1h"}) //send this token to the localstorage and It up to you to set the expire time 
+         //email: existingUser.email
         res.status(200).json({result: { _id: existingUser._id }, token})
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong'})
@@ -38,9 +40,10 @@ export const signup = async(req,res) =>{
         const hashPassword = await bcrypt.hash(password,12)
 
         const result = await kbookUser.create({email, password: hashPassword, name:`${firstName} ${lastName}`});
+        const decodeMessage = "Thank you decoding this and please don't try to steal my users information"
 
-        const token = jwt.sign({ email: result.email, id: result._id}, process.env.SECRET, {expiresIn: "1h"});
-
+        const token = jwt.sign({ message: decodeMessage, id: result._id}, process.env.SECRET, {expiresIn: "1h"});
+    
         res.status(200).json({result: { _id: existingUser._id },token})
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong'})
