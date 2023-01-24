@@ -19,7 +19,7 @@ export const signin = async(req,res) =>{
 
         const token = jwt.sign({ email: existingUser.email, id: existingUser._id}, process.env.SECRET, {expiresIn: "1h"}) //send this token to the localstorage and It up to you to set the expire time 
  
-        res.status(200).json({result: existingUser, token})
+        res.status(200).json({result: { _id: existingUser._id }, token})
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong'})
     }
@@ -41,7 +41,7 @@ export const signup = async(req,res) =>{
 
         const token = jwt.sign({ email: result.email, id: result._id}, process.env.SECRET, {expiresIn: "1h"});
 
-        res.status(200).json({result,token})
+        res.status(200).json({result: { _id: existingUser._id },token})
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong'})
     }
@@ -51,7 +51,7 @@ export const signup = async(req,res) =>{
 export const getUser = async(req, res) =>{
     const { id } = req.params;
     try {
-        const user  = await kbookUser.findById(id);
+        const user  = await kbookUser.findById(id).select("-password -email");
         res.status(200).json(user)
     } catch (error) {
         res.status(404).json({ message: error.message})
@@ -60,7 +60,7 @@ export const getUser = async(req, res) =>{
 
 export const getUsers = async(req,res) =>{
     try {
-        const users = await kbookUser.find()
+        const users = await kbookUser.find().select("-password -email")
         res.json(users)
     } catch (error) {
         res.status(404).json({ message: error.message });

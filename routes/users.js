@@ -3,7 +3,7 @@ import {signin, signup, getUser, updateUser, getUsers } from '../controllers/use
 import auth from '../middleware/auth.js';
 const router = express.Router();
 
-router.get('/',getUsers);
+router.get('/',auth,getUsers);
 router.get('/:id',auth, getUser);
 router.patch('/:id',auth, updateUser)
 router.post('/signin',signin);
