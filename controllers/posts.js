@@ -2,39 +2,51 @@ import mongoose from "mongoose";
 import PostDetail from "../models/postsDetails.js";
 import kbookUser from  "../models/user.js"
 
-export const getPosts = async(req, res) =>{
+
+export const getPostsByCreator = async(req, res) =>{
+  const {creator} = req.query
+  const {time} = req.query
   try {
-      const posts = await PostDetail.find()
-      res.status(200).json(posts)
+      const limitDocs = 4;
+      const skip = (Number(time) -1) * limitDocs
+      const total = await PostDetail.find({creator: creator}).countDocuments()
+      const posts = await PostDetail.find({creator: creator}).sort({_id: -1}).skip(skip).limit(limitDocs)
+
+  
+      res.status(200).json({data: posts, total: total})
+      // ({data: posts, totalPost: total})
   } catch (error) {
       res.status(404).json({ message: error.message });
   }
 }
 
-//development process
-// export const getPosts = async(req, res) =>{
-//     const {time} = req.query
 
-//     try {
-//         const limit = 4;
-//         const skip = (Number(time) - 1) * limit
-//         const total = await PostDetail.countDocuments()
-//         const posts = await PostDetail.find().sort({_id: -1}).skip(skip).limit(limit)
-//         console.log("request")
-//         res.status(200).json({data: posts, total: total})
-//         // ({data: posts, totalPost: total})
-//     } catch (error) {
-//         res.status(404).json({ message: error.message });
-//     }
-// }
+
+
+export const getPosts = async(req, res) =>{
+    const {time} = req.query
+
+    try {
+        const limitDocs = 4;
+        const skip = (Number(time) - 1) * limitDocs
+        const total = await PostDetail.countDocuments({})
+        const posts = await PostDetail.find().sort({_id: -1}).skip(skip).limit(limitDocs)
+        res.status(200).json({data: posts, total: total})
+        // ({data: posts, totalPost: total})
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
 
 export const createPost = async(req,res) =>{
     const post = req.body;
     const user = await kbookUser.findById(req.userId)
     const newPost = new PostDetail({...post, creator: req.userId, creatorAvatar: user.avatar, createdAt: new Date().toISOString()})   
+  
     try {
       await newPost.save();
-      res.status(201).json(newPost)
+      const total = await PostDetail.countDocuments()
+      res.status(201).json({data: newPost, total : total})
     } catch (error) {
       res.status(409).json({message: error.message});     
     }
@@ -53,10 +65,9 @@ export const updatePost = async(req,res) =>{
 export const deletePost = async(req,res) =>{
   const {id} = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
-
   await PostDetail.findByIdAndRemove(id);
-
-  res.json({ message: 'Post deleted susccessfully'})
+  const total = await PostDetail.countDocuments()
+  res.status(200).json({data: id, total: total})
 }
 
 export const likePost = async(req,res) =>{

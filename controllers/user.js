@@ -17,7 +17,7 @@ export const signin = async(req,res) =>{
 
         if(!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials"})
         
-        const decodeMessage = "Thank you decoding this and please don't try to steal my users information"
+        const decodeMessage = "Thank you decoding this and please don't try to steal my users information!"
          
         const token = jwt.sign({ message: decodeMessage ,id: existingUser._id}, process.env.SECRET, {expiresIn: "1h"}) //send this token to the localstorage and It up to you to set the expire time 
          //email: existingUser.email
